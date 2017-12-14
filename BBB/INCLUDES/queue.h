@@ -1,3 +1,13 @@
+/*****************************************************************************************
+* Authors : Vishal Vishnani, Raghav Sankrantipati
+* Date : 12/13/2017
+* 
+* File : queue.h
+* Description : Header file for Message Queues
+                -initilialize_queues()
+******************************************************************************************/
+
+
 #ifndef QUEUE_H
 #define QUEUE_H
 
@@ -20,7 +30,10 @@ mqd_t mqdes_logger;
 struct mq_attr attr_decision;
 mqd_t mqdes_decision;
 
+//Function to initialize queues
 void init_queues(void);
+
+//Function to close and delete queues
 void cleanup_queues(void);
 
 #endif

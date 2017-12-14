@@ -1,3 +1,11 @@
+/*****************************************************************************************
+* Authors : Vishal Vishnani, Raghav Sankrantipati
+* Date : 12/13/2017
+* 
+* File : log.h
+* Description : Header file for Log
+******************************************************************************************/
+
 #ifndef LOG_H
 #define LOG_H
 
