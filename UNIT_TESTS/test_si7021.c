@@ -2,7 +2,7 @@
 *@Filename:test_si7021.c
 *
 *@Description:This is a test for library of SI7021 sensor
-*@Author:Sai Raghavendra Sankrantipati
+*@Author:Sai Raghavendra Sankrantipati, Vishal Vishnani
 *@Date:13/12/2017
 *@Usage : Connect SI7021 to I2C 0 and check library functions to read and write registers
  **********************************************************************/
