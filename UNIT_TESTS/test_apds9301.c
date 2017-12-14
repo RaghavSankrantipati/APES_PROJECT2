@@ -3,7 +3,7 @@
 *@Filename:test_apds9301.c
 *
 *@Description:This is a test for library of APDS9301 sensor
-*@Author:Sai Raghavendra Sankrantipati
+*@Author:Sai Raghavendra Sankrantipati, Vishal Vishnani
 *@Date:13/12/2017
 *@Usage : Connect APDS 9301 to I2C 2 and check library functions to read and write registers
  **********************************************************************/
