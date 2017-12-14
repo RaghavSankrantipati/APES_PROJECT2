@@ -20,6 +20,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/uart.h"
 #include "comm.h"
+#include "utils/uartstdio.h"
 
 //Init UART7
 int uart_init(){
@@ -57,6 +58,7 @@ void UARTIntHandler(void)
     ui32Status = ROM_UARTIntStatus(UART7_BASE, true);
 	 // Clear the asserted interrupts.
     ROM_UARTIntClear(UART7_BASE, ui32Status);
+/*
 	// Loop while there are characters in the receive FIFO.
     while(ROM_UARTCharsAvail(UART7_BASE))
     {
@@ -67,6 +69,7 @@ void UARTIntHandler(void)
         SysCtlDelay(120000000 / (1000 * 3));
         GPIOPinWrite(GPIO_PORTN_BASE, GPIO_PIN_0, 0);
     }
+*/
 }
 
 
