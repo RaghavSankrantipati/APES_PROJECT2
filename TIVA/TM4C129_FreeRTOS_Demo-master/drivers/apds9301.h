@@ -1,13 +1,16 @@
-/*
- * apds9301.h
- *
- *  Created on: Dec 9, 2017
- *      Author: vishal
- */
+/**********************************************************************
+*@Filename:apds9301.h
+*
+*@Description:This is a header file of library for APDS 9301 sensor
+*@Author:Sai Raghavendra Sankrantipati, Vishal Vishnani
+*@Date:13/12/2017
+*@Usage : Connect APDS 9301 to I2C 2 and use any of the library function to read and write registers
+ **********************************************************************/
 
 #ifndef DRIVERS_APDS9301_H_
 #define DRIVERS_APDS9301_H_
 
+#include<stdint.h>
 /* Slave address of APDS 9301*/
 #define APDS9301_ADDRESS    0x39
 
@@ -44,8 +47,6 @@ uint8_t read_data1low(void);
 uint8_t read_data1high(void);
 uint8_t write_timereg(void);
 float get_luminosity(void);
-
-
-
-
+int write_reg(uint8_t reg, uint8_t value);
+int read_reg(uint8_t reg);
 #endif /* DRIVERS_APDS9301_H_ */

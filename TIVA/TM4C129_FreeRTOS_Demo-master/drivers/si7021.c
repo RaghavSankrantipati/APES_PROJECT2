@@ -1,9 +1,11 @@
-/*
- * si7021.c
- *
- *  Created on: Dec 9, 2017
- *      Author: vishal
- */
+/**********************************************************************
+*@Filename:si7021.c
+*
+*@Description:This is a library for SI7021 Humidity and temperature sensor
+*@Author:Sai Raghavendra Sankrantipati, Vishal Vishnani
+*@Date:13/12/2017
+*@Usage : Connect SI7021 9301 to I2C 2 and use any of the library function to read and write registers
+ **********************************************************************/
 
 #include <stdarg.h>
 #include <stdbool.h>
@@ -19,6 +21,8 @@
 #include "driverlib/pin_map.h"
 #include "si7021.h"
 
+/* Initialise sensor on I2C bus 0
+ * */
 uint8_t init_SI7021(void)
 {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_I2C0);
@@ -32,10 +36,10 @@ uint8_t init_SI7021(void)
     I2CMasterInitExpClk(I2C0_BASE, 120000000U, false);
     //I2CMasterInitExpClk(I2C0_BASE, SYSTEM_CLOCK, false);
     //HWREG(I2C0_BASE + I2C_O_FIFOCTL) = 80008000;
-    return 0;
+    return 1;
 }
 
-
+//returns humidity on successful operation
 float get_humidity(void){
 
     uint8_t hum_msb, hum_lsb;
@@ -57,7 +61,7 @@ float get_humidity(void){
     return humidity;
 }
 
-
+//returns temperature on successful operation
 float get_temperature(void){
 
     uint8_t temp_msb, temp_lsb;
@@ -79,7 +83,7 @@ float get_temperature(void){
     return temperature;
 }
 
-
+/*Return id of SI7021 Sensor*/
 float get_id(void){
 
     uint8_t id;
@@ -101,11 +105,14 @@ float get_id(void){
     return id;
 }
 
-
-void reset_SI7021(void){
+//Reset SI7021 sensor
+int reset_SI7021(void){
 
     I2CMasterSlaveAddrSet(I2C0_BASE, SI7021_ADDRESS, false);
     I2CMasterControl(I2C0_BASE, I2C_MASTER_CMD_BURST_SEND_START);
     I2CMasterDataPut(I2C0_BASE, COMMAND_REST);
     while(I2CMasterBusy(I2C0_BASE));
+    return 1;
 }
+
+
