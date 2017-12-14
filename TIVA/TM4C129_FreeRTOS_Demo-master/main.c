@@ -1,14 +1,12 @@
-/* FreeRTOS 8.2 Tiva Demo
- *
- * main.c
- *
- * Andy Kobyljanec
- *
- * This is a simple demonstration project of FreeRTOS 8.2 on the Tiva Launchpad
- * EK-TM4C1294XL.  TivaWare driverlib sourcecode is included.
- */
+/*****************************************************************************************
+* Authors : Vishal Vishnani, Raghav Sankrantipati
+* Date : 12/13/2017
+* 
+* File : main.c
+* Description : Source file for main thread
+*****************************************************************************************/
 
-
+/*Includes*/
 #include <stdint.h>
 #include <stdbool.h>
 #include <string.h>
@@ -34,7 +32,7 @@
 #include "utils/uartstdio.h"
 #include "drivers/comm.h"
 
-//packet structure
+/*packet structure*/
 typedef struct packet
 {
     uint8_t log_id;
@@ -44,9 +42,10 @@ typedef struct packet
     char c;
 }log_packet;
 
+/*size of queue*/
 #define QUEUE_LENGTH 10
 
-//enum for log level
+/*enum for log level*/
 typedef enum logger_level
 {
     SENSOR_DATA = 0,
@@ -58,7 +57,8 @@ typedef enum logger_level
     ERROR_SOCKET=6
 }log_level;
 
-//enum for task id
+
+/*enum for task id*/
 typedef enum task_id
 {
   MAIN_TASK = 0,
@@ -70,28 +70,52 @@ typedef enum task_id
 }tid;
 
 
-// Task declarations
+/* Task declarations*/
+
+/*Task which reads value from light sensor periodically and adds to queue
+* Also, sends heartbeat to heartbeat task at regular intervals*/
 void lightTask(void *pvParameters);
+
+/*Task which reads temeprtaure and humidity value from sensor periodically and adds them to queue
+* Also, sends heartbeat to heartbeat task at regular intervals*/
 void tempTask(void *pvParameters);
+
+/*Task which send whatever data is present in queue through UART*/
 void socketTask(void *pvParameters);
+
+/*Task which checks if all other tasks are alive*/
 void heartbeatTask(void *pvParameters);
+
+/*Callback function for timer which sends signal to light and temp task to read sensor data*/
 void vTimerCallback(void);
 
-//Queue
+/*Queue*/
 QueueHandle_t shared_queue;
 
-//Timer
+/*Timer*/
 TimerHandle_t xTimer;
 
-//semaphore
+/*semaphore*/
+
+/*Binary sempahore for light task to read sensor data and add to queue*/
 xSemaphoreHandle light_signal=0;
+
+/*Binary semaphore for tempertaure task to read temperature and humidity data and add to queue*/
 xSemaphoreHandle temp_signal=0;
+
+/*Mutex for queue for mutual exclusion*/
 xSemaphoreHandle queue_mutex=0;
+
+/*Binary semaphore for heartbeat of light task*/
 xSemaphoreHandle hb_light=0;
+
+/*Binary semaphore for heartbeat of temperature/humidity rask*/
 xSemaphoreHandle hb_temp=0;
+
+/*Binary semaphore for heartbeat of socket task*/
 xSemaphoreHandle hb_socket=0;
 
-
+/*Set to 1 for exit*/
 int exit_flag=0;
 
 void vTimerCallBack(void* a){
@@ -99,10 +123,10 @@ void vTimerCallBack(void* a){
     xSemaphoreGive(temp_signal);
 }
 
-// Main function
+/*Main function*/
 int main(void)
 {
-    // Initialize system clock to 120 MHz
+    /*Initialize system clock to 120 MHz*/
     uint32_t output_clock_rate_hz;
     output_clock_rate_hz = ROM_SysCtlClockFreqSet(
                                   (SYSCTL_XTAL_25MHZ | SYSCTL_OSC_MAIN |
@@ -110,13 +134,13 @@ int main(void)
                                   SYSTEM_CLOCK);
     ASSERT(output_clock_rate_hz == SYSTEM_CLOCK);
 
-    // Initialize the GPIO pins for the Launchpad
+    /*Initialize the GPIO pins for the Launchpad*/
     PinoutSet(false, false);
 
-    // Set up the UART which is connected to the virtual COM port
+    /*Set up the UART which is connected to the virtual COM port*/
     UARTStdioConfig(0, 115200, SYSTEM_CLOCK);
 
-    //Create a Queue
+    /*Create a Queue*/
     shared_queue = xQueueCreate(QUEUE_LENGTH,sizeof(log_packet));
     if(shared_queue == NULL){
         UARTprintf("\r\nQueue not be created\r\n");
@@ -125,16 +149,17 @@ int main(void)
     UARTprintf("\r\nHELLO!! INSIDE MAIN\r\n");
 
 
-    //create binary semaphore
+    /*create binary semaphores*/
     vSemaphoreCreateBinary(light_signal);
     vSemaphoreCreateBinary(temp_signal);
     vSemaphoreCreateBinary(hb_light);
     vSemaphoreCreateBinary(hb_temp);
     vSemaphoreCreateBinary(hb_socket);
 
+    /*Create mutex*/
     queue_mutex=xSemaphoreCreateMutex();
 
-    // Create tasks
+    /*Create tasks*/
     xTaskCreate(lightTask, (const portCHAR *)"LIGHT_TASK",1024, NULL, 1, NULL);
 
     xTaskCreate(tempTask, (const portCHAR *)"TEMP_TASK",1024, NULL, 1, NULL);
@@ -143,6 +168,7 @@ int main(void)
 
     xTaskCreate(heartbeatTask, (const portCHAR *)"HEARTBEAT_TASK",1024, NULL, 1, NULL);
 
+    /*Create timer*/
     xTimer=xTimerCreate("Timer",2000,pdTRUE,(void*)0,vTimerCallBack);
     if(xTimer==NULL){
         UARTprintf("\r\nTimer Creation Failed\r\n");
@@ -160,6 +186,8 @@ int main(void)
     return 0;
 }
 
+
+/*This task checks if all other tasks are alive using binary sempahore*/
 void heartbeatTask(void *pvParameters){
     log_packet error_packet;
     memset((void*)&error_packet,0,sizeof(error_packet));
@@ -216,7 +244,7 @@ void heartbeatTask(void *pvParameters){
     }
 }
 
-
+/*This task sends whatever data is present in the queue through UART*/
 void socketTask(void *pvParameters){
     log_packet recv;
 
@@ -259,7 +287,8 @@ void socketTask(void *pvParameters){
     //UARTprintf("\r\nEnd of socket task\r\n");
 }
 
-
+/*This task reads data from light sensor periodically and adds it to the queue
+* Also sends heartbeat to heartbeat task at periodic intervals*/
 void lightTask(void *pvParameters){
     init_APDS9301();
     write_timereg();
@@ -301,6 +330,8 @@ void lightTask(void *pvParameters){
 }
 
 
+/*This task reads data from temperature sensor periodically and adds it to the queue
+* Also sends heartbeat to heartbeat task at periodic intervals*/
 
 void tempTask(void *pvParameters){
     init_SI7021();
@@ -312,7 +343,7 @@ void tempTask(void *pvParameters){
         /* Wait for the maximum period for data to become available on the queue.
         The period will be indefinite if INCLUDE_vTaskSuspend is set to 1 in
         FreeRTOSConfig.h. */
-       // xSemaphoreGive(hb_temp);
+        xSemaphoreGive(hb_temp);
         if(exit_flag==1){
             vTaskDelete(NULL);
         }
