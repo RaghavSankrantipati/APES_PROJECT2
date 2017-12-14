@@ -2,7 +2,7 @@
 *@Filename:test_comm.c
 *
 *@Description:This is a test for library of UART7 
-*@Author:Sai Raghavendra Sankrantipati
+*@Author:Sai Raghavendra Sankrantipati, Vishal Vishnani
 *@Date:13/12/2017
 *@Usage : Connect PC4 to PC5 0 and check library functions to send and recieve data over UART 7
  **********************************************************************/
