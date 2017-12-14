@@ -1,10 +1,23 @@
+/*****************************************************************************************
+* Authors : Vishal Vishnani, Raghav Sankrantipati
+* Date : 12/13/2017
+* 
+* File : queue.c
+* Description : Source file for queues
+*               -cleanup_queues()
+*               -init_queues()
+*****************************************************************************************/
+
+/*Includes*/
 #include "queue.h"
 
+/*Function to close queues*/
 void cleanup_queues(void){
   mq_close(mqdes_logger);
   mq_close(mqdes_decision);
 }
 
+/*Function to initialize queues*/
 void init_queues(void){
   attr_logger.mq_maxmsg=NO_OF_MSG;
   attr_logger.mq_msgsize=sizeof(log_packet);

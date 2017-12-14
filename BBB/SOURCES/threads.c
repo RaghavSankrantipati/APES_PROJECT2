@@ -1,3 +1,15 @@
+/*****************************************************************************************
+* Authors : Vishal Vishnani, Raghav Sankrantipati
+* Date : 12/13/2017
+* 
+* File : threads.c
+* Description : Source file for threads
+*               -siginthandler()
+*               -pthread_initialize()
+*               -cleanup_threads()
+*****************************************************************************************/
+
+/*Includes*/
 #include <pthread.h>
 #include "threads.h"
 #include <stdio.h>
@@ -10,6 +22,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+
+/*Signalhandler for SIGINT to exit gracefully*/
 void siginthandler(){
   printf("\nIn SIGINT handler\n");
   int8_t ret=0;
@@ -46,7 +60,7 @@ void siginthandler(){
 
 
 
-
+/*Function to create threads, initialize mutexes and condition variables*/
 void pthread_initialize(void){
   int8_t ret=1;
 
@@ -101,7 +115,7 @@ void pthread_initialize(void){
 }
 
 
-
+/*Function to destroy mutexes and condition variables*/
 void cleanup_threads(void){
   int8_t ret=1;
   ret=pthread_mutex_destroy(&log_mutex);

@@ -1,3 +1,15 @@
+/*****************************************************************************************
+* Authors : Vishal Vishnani, Raghav Sankrantipati
+* Date : 12/13/2017
+* 
+* File : socket.c
+* Description : Source file for socket thread
+*               -tty_config()
+*               -uart_init()
+*               -socket_func()
+*****************************************************************************************/
+
+/*Include*/
 #include <stdio.h>
 #include <mqueue.h>
 #include "log.h"
@@ -8,6 +20,7 @@
 
 char *device = "/dev/ttyO4";
 
+/*Function to configure UART*/
 void tty_config(struct termios *con, int descriptor)
 {
   tcgetattr(descriptor, con);
@@ -28,7 +41,7 @@ void tty_config(struct termios *con, int descriptor)
   }
 }
 
-
+/*Function to initialize UART*/
 void uart_init(void)
 {
    
@@ -48,7 +61,8 @@ void uart_init(void)
 }
 
 
-
+/* Thread function which receives data through UART and stores them in log and decision queue.
+*  Also periodically sends heartbeat to main*/
 
 void* socket_func(void* t){
   log_packet recv;

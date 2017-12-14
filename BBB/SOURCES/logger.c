@@ -1,9 +1,22 @@
+/*****************************************************************************************
+* Authors : Vishal Vishnani, Raghav Sankrantipati
+* Date : 12/13/2017
+* 
+* File : logger.c
+* Description : Source file for logger thread
+*               -log_func()
+*****************************************************************************************/
+
+/*Includes*/
 #include "log.h"
 #include "threads.h"
 #include "queue.h"
 #include <string.h>
 #include <stdlib.h>
 
+
+/*Take the data from log queue and stores them in a file in a specific format.
+* Periodically sends heartbeat to main*/
 void* log_func (void* t){
   char logger_level[4][15]={"SENSOR_DATA","ERROR","INFO","ALERT"};
   char task_no[6][15]={"MAIN_TASK","SOCKET_TASK","TEMP_TASK","LIGHT_TASK","HUMIDITY_TASK","DECISION_TASK"};

@@ -1,3 +1,13 @@
+/*****************************************************************************************
+* Authors : Vishal Vishnani, Raghav Sankrantipati
+* Date : 12/13/2017
+* 
+* File : main.c
+* Description : Source file for main
+*               -heartbeat_init()
+*****************************************************************************************/
+
+/*INCLUDES*/
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -12,41 +22,8 @@
 #include "queue.h"
 #include "log.h"
 
-/*
-void siginthandler(){
-  printf("\nIn SIGINT handler\n");
-  int8_t ret=0;
 
-  log_packet packet;
-  time_t curtime;
-  memset(&packet,0,sizeof(packet));
-  packet.level=ERROR;
-  packet.task_ID=MAIN_TASK;
-  strcpy(packet.log_message,"EXIT GRACEFULLY");
-  strcpy(packet.data,"0");
-  curtime=time(NULL);
-  char* temp=ctime(&curtime);
-  strcpy(packet.current_time,temp);
-
-
-  ret=pthread_mutex_trylock(&log_mutex);
-  if(ret==0){
-
-    if(mq_send(mqdes_logger,(const int8_t*)&packet,sizeof(packet),0)==-1){
-      printf("\nError in mq_send logger in sig handler\n");
-      exit(1);
-    }
-
-    ret=pthread_mutex_unlock(&log_mutex);
-    if(ret){
-      printf("\nError: log mutex unlock failed in sighandler\n");
-    }
-  }
-  printf("\nEnd of sigint handler\n");
-  exit_flag=1;
-}
-*/
-
+/*Function to initialize heartbeat timer*/
 struct timespec heartbeat_init(uint32_t sec_value,uint32_t nsec_value){
   struct timespec t1;
   struct timeval t2;
@@ -109,6 +86,7 @@ int main(int argc,char* argv[]){
   
   memset(&main_packet,0,sizeof(main_packet));
 
+  //log packet for threads spawned
   main_packet.level=INFO;
   main_packet.task_ID=MAIN_TASK;
   strcpy(main_packet.log_message,"THREADS SPAWNED");
@@ -137,6 +115,7 @@ int main(int argc,char* argv[]){
 
   memset(&main_packet,0,sizeof(main_packet));
 
+  //log packet for queues initialized
   main_packet.level=INFO;
   main_packet.task_ID=MAIN_TASK;
   strcpy(main_packet.log_message,"QUEUES INITIALIZED");
@@ -168,8 +147,10 @@ int main(int argc,char* argv[]){
   while(1){
     memset(&main_packet,0,sizeof(main_packet));
 
+    //initialize heart beat timer
     heartbeat_timer=heartbeat_init(5,400000);
 
+    //Used to check graceful exit, if a thread is killed
     count_kill++;
 
     if(count_kill==10){
@@ -181,7 +162,7 @@ int main(int argc,char* argv[]){
       break;
     }
 
-
+    //heartbeat for socket thread
     ret=pthread_mutex_lock(&heartbeat_mutex);
     if(ret){
       printf("\nHeartbeat mutex lock failed in main\n");
@@ -231,7 +212,7 @@ int main(int argc,char* argv[]){
 
 
 
-
+    //heartbeat for decision thread
     ret=pthread_mutex_lock(&heartbeat_mutex);
     if(ret){
       printf("\nHeartbeat mutex lock failed in main\n");
@@ -281,7 +262,7 @@ int main(int argc,char* argv[]){
 
   
   
-    
+    //heartbeat for logger thread
     ret=pthread_mutex_lock(&heartbeat_mutex);
     if(ret){
       printf("\nHeartbeat mutex lock failed in main\n");
@@ -304,6 +285,7 @@ int main(int argc,char* argv[]){
     
   }
 
+  //wait for threads to join
   int i=0;
   for(i=0;i<3;i++){
     ret=pthread_join(threads[i],NULL);
@@ -312,6 +294,7 @@ int main(int argc,char* argv[]){
     }
   }
 
+  //destroy all mutex, condition variables and queues
   cleanup_threads();
 
   cleanup_queues();
