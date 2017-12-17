@@ -160,13 +160,58 @@ int main(void)
     queue_mutex=xSemaphoreCreateMutex();
 
     /*Create tasks*/
-    xTaskCreate(lightTask, (const portCHAR *)"LIGHT_TASK",1024, NULL, 1, NULL);
+    log_packet error_packet;
+    memset((void*)&error_packet,0,sizeof(error_packet));
 
-    xTaskCreate(tempTask, (const portCHAR *)"TEMP_TASK",1024, NULL, 1, NULL);
+    // Create tasks
+    if(xTaskCreate(lightTask, (const portCHAR *)"LIGHT_TASK",1024, NULL, 1, NULL)!=pdPASS){
+        error_packet.data=0.0;
+        time_t c = time(NULL);
+        char* temp=ctime(&c);
+        strcpy(error_packet.timestamp,temp);
 
-    xTaskCreate(socketTask, (const portCHAR *)"SOCKET_TASK",1024, NULL, 1, NULL);
+        error_packet.log_level =(uint8_t)ERROR_LIGHT;
+        error_packet.log_id = (uint8_t)MAIN_TASK;
+        error_packet.c='\0';
+        exit_flag=1;
+    }
 
-    xTaskCreate(heartbeatTask, (const portCHAR *)"HEARTBEAT_TASK",1024, NULL, 1, NULL);
+    if(xTaskCreate(tempTask, (const portCHAR *)"TEMP_TASK",1024, NULL, 1, NULL)!=pdPASS){
+        error_packet.data=0.0;
+        time_t c = time(NULL);
+        char* temp=ctime(&c);
+        strcpy(error_packet.timestamp,temp);
+
+        error_packet.log_level =(uint8_t)ERROR_TEMP;
+        error_packet.log_id = (uint8_t)MAIN_TASK;
+        error_packet.c='\0';
+        exit_flag=1;
+    }
+
+    if(xTaskCreate(socketTask, (const portCHAR *)"SOCKET_TASK",1024, NULL, 1, NULL)!=pdPASS){
+        error_packet.data=0.0;
+        time_t c = time(NULL);
+        char* temp=ctime(&c);
+        strcpy(error_packet.timestamp,temp);
+
+        error_packet.log_level =(uint8_t)ERROR_SOCKET;
+        error_packet.log_id = (uint8_t)MAIN_TASK;
+        error_packet.c='\0';
+
+        exit_flag=1;
+    }
+
+    if(xTaskCreate(heartbeatTask, (const portCHAR *)"HEARTBEAT_TASK",1024, NULL, 1, NULL)!=pdPASS){
+        error_packet.data=0.0;
+        time_t c = time(NULL);
+        char* temp=ctime(&c);
+        strcpy(error_packet.timestamp,temp);
+
+        error_packet.log_level =(uint8_t)ERROR;
+        error_packet.log_id = (uint8_t)MAIN_TASK;
+        error_packet.c='\0';
+        exit_flag=1;
+    }
 
     /*Create timer*/
     xTimer=xTimerCreate("Timer",2000,pdTRUE,(void*)0,vTimerCallBack);
