@@ -2,6 +2,12 @@
 Project 2 repository for APES ECEN 5013
 A multithreaded home automation system in which, BeagleBone(BBG) is used as a remote logger system while TIVA acts as a sensor hub. The sensor hub collects data values from different sensors and sends them to BBG over UART communication
 
+## Overview of Tasks
+Refer 
+* [software_archtecture.pdf](https://github.com/RaghavSankrantipati/APES_PROJECT2/blob/master/software_architecture.pdf)
+* [presentation.ppt](https://github.com/RaghavSankrantipati/APES_PROJECT2/blob/master/presentation.pptx)
+* [Updated Software Architecture](https://github.com/RaghavSankrantipati/APES_PROJECT2/tree/master/Updated%20Software%20Architecture)
+
 ### Apparatus
 * Beaglebone Green
 * Tiva TM4C1294XL
